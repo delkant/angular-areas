@@ -5,12 +5,14 @@ Angular Directive ( ng-areas )  that let you select and manipulate multiple area
 
 ## Use like so:
 
-    $("#mypic").selectAreas({
-      minSize: [30, 30],    // Minimum size of a selection
-      maxSize: [400, 300],  // Maximum size of a selection
-      onChanged: $.noop,    // fired when a selection is released
-      onChanging: $.noop    // fired during the modification of a selection
-    });
+    <div ng-controller="DemoController">
+		<img ng-areas="fields" ng-areas-width="900"
+			ng-areas-allow="{'edit':true, 'move':true, 'resize':true, 'select':true, 'remove':true, 'nudge':false}"
+			ng-areas-on-add="onAddArea()"
+			ng-areas-on-remove="onRemoveArea(id)"
+			ng-areas-on-change="onChangeAreas(ev, boxId, areas, area)"
+			src="angularjsORG.jpg">
+	</div>
 
 
 ## DEMO and example to learn from.
