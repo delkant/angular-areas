@@ -27,7 +27,6 @@ This plugin is fully compatible with every modern browser and IE >= 9.
 An area is described (when retrieved or set) by a json object:
 
     {
-        id, // ID identifying the area in the plugin
         x,  // X coordinate (Position)
         y,  // Y coordinate (Position)
         z,  // Z-index (0 when inactive or 100 when focused)
@@ -38,6 +37,7 @@ An area is described (when retrieved or set) by a json object:
 ## Options and parameters
 Here is a list of available options for selectAreas, with their *default value*:
  - **ng-areas-allow** : Json Object
+ 
  i.e.  ng-areas-allow="{'edit':true, 'move':true, 'resize':false, 'select':true, 'remove':false, 'nudge':false}"
 			
  - **edit** (*true*) : When set to false, unset allowMove, allowResize, allowSelect and allowDelete
@@ -48,7 +48,9 @@ Here is a list of available options for selectAreas, with their *default value*:
  - **nudge** (*true*) : When set to false, Areas can not be moved with arrow keys.
  
  - **ng-areas** : Required attribute. Area list **areas** (*[]*) : list of areas to add to the image from the beginning  (id will be ignored);
+ 
  	controller i.e.:
+ 
     **$scope.areasArray** = [ {
 		"x" : 557,
 		"y" : 35,
@@ -70,6 +72,7 @@ Here is a list of available options for selectAreas, with their *default value*:
 		"id" : 35,
 		"description" : "AngularJS Main Logo"
 	} ];
+ 
  	template i.e.: **ng-areas="areasArray"** 
  
  - **ng-areas-width** (*0*) : When not 0, scale the image to this width (px).
