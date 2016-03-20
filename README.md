@@ -16,7 +16,7 @@ Angular Directive ( ng-areas )  that let you select and manipulate multiple area
 
 
 ## DEMO and example to learn from.
-Check out [DEMO](https://rawgit.com/delkant/angular-areas/angular-areas/master/src/main/webapp/demo.html)
+Check out [DEMO](https://rawgit.com/delkant/angular-areas/master/src/main/webapp/demo/index.html)
 
 ## Browser Compatibiilty:
 This plugin is fully compatible with every modern browser and IE >= 9.
