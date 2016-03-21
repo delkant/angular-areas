@@ -2,9 +2,14 @@
 Angular Directive ( ng-areas )  that let you select and manipulate multiple areas on an image, create, edit, move and resize them too.
 
 # Quick Start
+#### Install with Bower
+```sh
+$ bower install angular-areas
+```
+
 
 ## Use like so:
-
+```sh
     <div ng-controller="DemoController">
 		<img ng-areas="fields" ng-areas-width="900"
 			ng-areas-allow="{'edit':true, 'move':true, 'resize':true, 'select':true, 'remove':true, 'nudge':false}"
@@ -13,7 +18,7 @@ Angular Directive ( ng-areas )  that let you select and manipulate multiple area
 			ng-areas-on-change="onChangeAreas(ev, boxId, areas, area)"
 			src="angularjsORG.jpg">
 	</div>
-
+```
 
 ## DEMO and example to learn from.
 Check out the [DEMO](https://rawgit.com/delkant/angular-areas/master/src/main/webapp/demo/index.html)
@@ -26,6 +31,7 @@ This plugin is fully compatible with every modern browser and IE >= 9.
 ## Area
 An area is described (when retrieved or set) by a json object:
 
+```sh
     {
         x,  // X coordinate (Position)
         y,  // Y coordinate (Position)
@@ -33,6 +39,7 @@ An area is described (when retrieved or set) by a json object:
         width,  // Width of the area (Size)
         height  // Height of the area (Size)
     }
+```
 
 ## Options and parameters
 Here is a list of available options for selectAreas, with their *default value*:
@@ -50,7 +57,7 @@ Here is a list of available options for selectAreas, with their *default value*:
  - **ng-areas** : Required attribute. Area list **areas** (*[]*) : list of areas to add to the image from the beginning  (id will be ignored);
  
  	controller i.e.:
- 
+ ```sh
     **$scope.areasArray** = [ {
 		"x" : 557,
 		"y" : 35,
@@ -72,8 +79,11 @@ Here is a list of available options for selectAreas, with their *default value*:
 		"id" : 35,
 		"description" : "AngularJS Main Logo"
 	} ];
- 
- 	template i.e.: **ng-areas="areasArray"** 
+ ```
+ 	template i.e.: 
+```sh 	
+ 	**ng-areas="areasArray"** 
+ ```
  
  - **ng-areas-width** (*0*) : When not 0, scale the image to this width (px).
 
