@@ -58,7 +58,7 @@ Here is a list of available options for selectAreas, with their *default value*:
  
  	controller i.e.:
  ```sh
-    **$scope.areasArray** = [ {
+    $scope.areasArray = [ {
 		"x" : 557,
 		"y" : 35,
 		"z" : 100,
@@ -82,7 +82,7 @@ Here is a list of available options for selectAreas, with their *default value*:
  ```
  	template i.e.: 
 ```sh 	
- 	**ng-areas="areasArray"** 
+ 	<img ng-areas="areasArray" src="aImage.jpg">
  ```
  
  - **ng-areas-width** (*0*) : When not 0, scale the image to this width (px).
