@@ -94,4 +94,14 @@ Three events are fired by the plugin:
  - **ng-areas-on-change** (*null*) : triggered when the event "changed" is fired. arguments : (event, id, areas, area)
  
  
+ ## LICENSE
+ ```sh 	
+ 	MIT
+ ```
+ 
+ 
+ 
+ 
+ 
+ 
  Inspired by https://github.com/360Learning/jquery-select-areas
