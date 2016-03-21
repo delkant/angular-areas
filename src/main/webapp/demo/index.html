@@ -34,7 +34,13 @@
 			ng-areas-on-add="onAddArea()"
 			ng-areas-on-remove="onRemoveArea(id)"
 			ng-areas-on-change="onChangeAreas(ev, boxId, areas, area)"
-			src="angularjsORG.jpg">
+			ng-src="angularjsORG.jpg">
+			<img ng-areas="fields" ng-areas-width="600"
+			ng-areas-allow="{'edit':true, 'move':true, 'resize':true, 'select':true, 'remove':true, 'nudge':false}"
+			ng-areas-on-add="onAddArea()"
+			ng-areas-on-remove="onRemoveArea(id)"
+			ng-areas-on-change="onChangeAreas(ev, boxId, areas, area)"
+			ng-src="angularjsORG.jpg">
 	</div>
 </body>
 </html>

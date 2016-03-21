@@ -1,8 +1,8 @@
-var ngSelectAreas = angular.module('ngAreas', []);
+var ngAreas = angular.module('ngAreas', []);
 
-ngSelectAreas.version = '1.0.0';
+ngAreas.version = '1.0.1';
 
-ngSelectAreas.directive("ngAreas", ['$parse', function ($parse) {
+ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 	return {
 		restrict : 'A',
 		controller : function($scope, $element, $attrs) {
@@ -17,26 +17,30 @@ ngSelectAreas.directive("ngAreas", ['$parse', function ($parse) {
 			    	var invoker = $parse($attrs.ngAreasOnChange);
 		            invoker($scope, {ev:ev, boxId:boxId, areas:areas, area:area});
 			    }
-				$scope.$watch($attrs.ngAreas,function(newVal, oldVal) {
-					initSelectAreas(
-							$element,
-							{
-								width : (typeof $attrs.ngAreasWidth === 'undefined') ? 1200 : $attrs.ngAreasWidth,
-								areas : newVal,
-								onAdd : (typeof $attrs.ngAreasOnAdd === 'undefined') ? null
-										: onAdd,
-								onDelete : (typeof $attrs.ngAreasOnRemove === 'undefined') ? null
-										: onDelete,
-								onChanged : (typeof $attrs.ngAreasOnChange === 'undefined') ? null
-										: onChange,
-								allowEdit: (typeof allow.edit === 'undefined') ? true : allow.edit,
-				                allowMove: (typeof allow.move === 'undefined') ? true : allow.move,
-				                allowResize: (typeof allow.resize === 'undefined') ? true : allow.resize,
-				                allowSelect: (typeof allow.select === 'undefined') ? true : allow.select,
-				                allowDelete: (typeof allow.remove === 'undefined') ? true : allow.remove,
-				                allowNudge: (typeof allow.nudge === 'undefined') ? true : allow.nudge   
-							});
-					});
+			    $element.bind('load', function() {
+			    	var mainImageSelectAreas = new imageSelectAreas();        
+			    	mainImageSelectAreas.init($element,
+									{
+										width : (typeof $attrs.ngAreasWidth === 'undefined') ? 800 : $attrs.ngAreasWidth,
+										areas : $scope.$eval($attrs.ngAreas),
+										onAdd : (typeof $attrs.ngAreasOnAdd === 'undefined') ? null
+												: onAdd,
+										onDelete : (typeof $attrs.ngAreasOnRemove === 'undefined') ? null
+												: onDelete,
+										onChanged : (typeof $attrs.ngAreasOnChange === 'undefined') ? null
+												: onChange,
+										allowEdit: (typeof allow.edit === 'undefined') ? true : allow.edit,
+						                allowMove: (typeof allow.move === 'undefined') ? true : allow.move,
+						                allowResize: (typeof allow.resize === 'undefined') ? true : allow.resize,
+						                allowSelect: (typeof allow.select === 'undefined') ? true : allow.select,
+						                allowDelete: (typeof allow.remove === 'undefined') ? true : allow.remove,
+						                allowNudge: (typeof allow.nudge === 'undefined') ? true : allow.nudge   
+									});
+		         });
+
+  				 $element.bind('error', function(){
+  					 $.error( "Method " +  customOptions + " on load error" );
+  				 });
 			
 			   var imageArea = function(parent, areaid) {
 			        var options = parent.options,
@@ -597,7 +601,7 @@ ngSelectAreas.directive("ngAreas", ['$parse', function ($parse) {
 
 			    var imageSelectAreas = function() { };
 
-			    imageSelectAreas.prototype.init = function (object, customOptions) {
+			    imageSelectAreas.prototype.init = function (img, customOptions) {
 			        var that = this,
 			            defaultOptions = {
 			                allowEdit: true,
@@ -629,7 +633,7 @@ ngSelectAreas.directive("ngAreas", ['$parse', function ($parse) {
 			        this._areas = {};
 
 			        // Initialize the image layer
-			        this.$image = $(object);
+			        this.$image = $(img);
 
 			        this.ratio = 1;
 			        if (this.options.width && this.$image.width() && this.options.width !== this.$image.width()) {
@@ -880,17 +884,7 @@ ngSelectAreas.directive("ngAreas", ['$parse', function ($parse) {
 			        });
 			        return res;
 			    };
-
-			    var selectAreas = function(object, options) {
-			        var $object = $(object);
-			        if (! $object.data("mainImageSelectAreas")) {
-			            var mainImageSelectAreas = new imageSelectAreas();
-			            mainImageSelectAreas.init(object, options);
-			            $object.data("mainImageSelectAreas", mainImageSelectAreas);
-			            $object.trigger("loaded");
-			        }
-			        return $object.data("mainImageSelectAreas");
-			    };
+			
 			    
 			    var execCommand = function (currentObject, command){
 			    	if ( imageSelectAreas.prototype[command] ) { // Method call
@@ -901,25 +895,6 @@ ngSelectAreas.directive("ngAreas", ['$parse', function ($parse) {
 			        	console.error("error command "+ command +" not found!");
 			        }
 			    }
-
-			    var initSelectAreas = function(elements, customOptions) {
-			    	if ( typeof elements === "object" || ! elements ) { // Initialization
-			            //Iterate over each object
-			    		elements.each(function() {	
-			    			var currentObject = this;
-			    			var image = new Image();
-			                // And attach selectAreas when the object is loaded
-			                image.onload = function() {
-			                    selectAreas(currentObject, customOptions);
-			                };
-	
-			                // Reset the src because cached images don"t fire load sometimes
-			                image.src = currentObject.src;
-			    		});
-			        } else {
-			            $.error( "Method " +  customOptions + " does not exist on jQuery.selectAreas" );
-			        }
-			    };
 		},
 		link : function(scope, element, attrs) {
 			console.log('linked ngSelectAreas link');
