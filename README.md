@@ -78,7 +78,7 @@ Here is a list of available options for selectAreas, with their *default value*:
  - **ng-areas-width** (*0*) : When not 0, scale the image to this width (px).
 
  - **ng-areas-extend-data** each area will have the properties defined on this JSON object.
-  This can be used when you have multiple images with areas on it and you want to know to what image a area-box belongs to. 
+  This can be used when you have multiple images with areas on them and you want to know to what image belongs a area-box. 
   You could also use this to create tags to identify the fields.
    
  - **ng-areas-allow** : Json Object
@@ -98,6 +98,7 @@ Three events are fired by the plugin:
  - **ng-areas-on-remove** (*null*): fired a selected area is removed. arguments : (event, id, areas, area)
  - **ng-areas-on-add**  (*null*): fired when a selection is released. arguments : (event, id, areas, area)
  - **ng-areas-on-change** (*null*) : triggered when the event "changed" is fired. arguments : (event, id, areas, area)
+ 
  
   
  Inspired by https://github.com/360Learning/jquery-select-areas
