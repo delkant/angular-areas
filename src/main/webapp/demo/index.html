@@ -29,18 +29,24 @@
 		ng-areas-width=&quot;900&quot; src=&quot;angularjsORG.jpg&quot;&gt;
   	</pre>
 	<div ng-controller="DemoController">
-		<img ng-areas="fields" ng-areas-width="900"
+		<img ng-areas="fields900" ng-areas-width="900"
 			ng-areas-allow="{'edit':true, 'move':true, 'resize':true, 'select':true, 'remove':true, 'nudge':false}"
-			ng-areas-on-add="onAddArea()"
-			ng-areas-on-remove="onRemoveArea(id)"
-			ng-areas-on-change="onChangeAreas(ev, boxId, areas, area)"
+			ng-areas-on-add="onAddArea"
+			ng-areas-on-remove="onRemoveArea"
+			ng-areas-on-change="onChangeAreas900"
+			ng-areas-extend-data="{pageNumber: 1, tag: 'width900'}"
 			ng-src="angularjsORG.jpg">
-			<img ng-areas="fields" ng-areas-width="600"
+		<div>Event Log: {{log900}}</div>
+			
+		<img ng-areas="fields600" ng-areas-width="600"
 			ng-areas-allow="{'edit':true, 'move':true, 'resize':true, 'select':true, 'remove':true, 'nudge':false}"
-			ng-areas-on-add="onAddArea()"
-			ng-areas-on-remove="onRemoveArea(id)"
-			ng-areas-on-change="onChangeAreas(ev, boxId, areas, area)"
+			ng-areas-on-add="onAddArea"
+			ng-areas-on-remove="onRemoveArea"
+			ng-areas-on-change="onChangeAreas600"
+			ng-areas-extend-data="{pageNumber: 1, tag: 'width600'}"
 			ng-src="angularjsORG.jpg">
+			<div>Event Log: {{log600}}</div>
+			
 	</div>
 </body>
 </html>

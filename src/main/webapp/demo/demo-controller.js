@@ -5,7 +5,7 @@ angular.module('app').controller('DemoController', function($scope
 ) {
 	// $http.get('data-api.json').success(function(response) {
 	// $scope.fields = response.data;
-	$scope.fields = [ {
+	var testData = [ {
 		"x" : 557,
 		"y" : 35,
 		"z" : 100,
@@ -46,16 +46,32 @@ angular.module('app').controller('DemoController', function($scope
 		"id" : 38,
 		"description" : "Angular1 Button"
 	} ];
-	$scope.onAddArea = function() {
+	
+	$scope.fields900 = testData.slice(0);
+	$scope.fields600 = testData.slice(0);
+	
+	$scope.onAddArea = function(ev, boxId, areas, area) {
 		console.log("area added");
 	}
-	$scope.onRemoveArea = function(id) {
-		if (id) {
-			console.log("area removed " + id);
+	$scope.onRemoveArea = function(ev, boxId, areas, area) {
+		$scope.log900= JSON.stringify(areas);
+		$scope.$apply();
+		if (area.id) {
+			//since new areas doesn't have id
+			console.log("one of my initial areas has been removed " + area.id);
 		}
 	}
-	$scope.onChangeAreas = function(ev, boxId, areas, area) {
-		console.log(JSON.stringify(areas));
+	
+	$scope.onChangeAreas900 = function(ev, boxId, areas, area) {
+		console.log(areas);
+		$scope.log900 = JSON.stringify(areas);
+		$scope.$apply();
 	}
+	
+	$scope.onChangeAreas600 = function(ev, boxId, areas, area) {
+		$scope.log600 = JSON.stringify(areas);
+		$scope.$apply();
+	}
+
 	// });
 });
