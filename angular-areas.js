@@ -1,38 +1,61 @@
 var ngAreas = angular.module('ngAreas', []);
 
 ngAreas.version = '1.0.2';
-
+ngAreas._areas = {};
+ngAreas.areaid = -1;
 ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 	return {
 		restrict : 'A',
-		scope:{
-			ngAreas: '=',
-			allow: '=ngAreasAllow',
-			ngAreasExtendData: '=',
-			ngAreasOnAdd: '=',
-			ngAreasOnRemove: '=',
-			ngAreasOnChange: '='
-		},
 		controller : function($scope, $element, $attrs) {
-	    	$scope.allow = (typeof $scope.allow === 'undefined') ? {}:$scope.allow;
-	    			    
-		    $element.bind('load', function() {
-		    	$scope.selectAreas($element,
-					{
-						width : (typeof $attrs.ngAreasWidth === 'undefined') ? 800 : $attrs.ngAreasWidth,
-						areas : $scope.ngAreas,
-						onAdd : (typeof $attrs.ngAreasOnAdd === 'undefined') ? null : $scope.ngAreasOnAdd,
-						onDelete : (typeof $attrs.ngAreasOnRemove === 'undefined') ? null : $scope.ngAreasOnRemove,
-						onChanged : (typeof $attrs.ngAreasOnChange === 'undefined') ? null: $scope.ngAreasOnChange,
-						allowEdit:   (typeof $scope.allow.edit === 'undefined') ? true : $scope.allow.edit,
-		                allowMove:   (typeof $scope.allow.move === 'undefined') ? true : $scope.allow.move,
-		                allowResize: (typeof $scope.allow.resize === 'undefined') ? true : $scope.allow.resize,
-		                allowSelect: (typeof $scope.allow.select === 'undefined') ? true : $scope.allow.select,
-		                allowDelete: (typeof $scope.allow.remove === 'undefined') ? true : $scope.allow.remove,
-		                allowNudge:  (typeof $scope.allow.nudge === 'undefined') ? true : $scope.allow.nudge   
-					}
-	            );
-	         });
+			var imageSelectAreas = function() { };
+			var mainImageSelectAreas = new imageSelectAreas();
+			var allow = (typeof $attrs.ngAreasAllow === 'undefined') ? {}: eval('('+$attrs.ngAreasAllow+')');
+	    	var getParameters = function(){
+	    			$scope.ngAreas_areas = $scope.$eval($attrs.ngAreas);
+	    			console.log(JSON.stringify($scope.ngAreas_areas));
+						return  {		
+							width : (typeof $attrs.ngAreasWidth === 'undefined') ? 800 : $attrs.ngAreasWidth,
+							areas : (typeof $attrs.ngAreas ==='undefined') ? [] : $scope.ngAreas_areas,
+							onLoaded : (typeof $attrs.ngAreasOnLoad === 'undefined') ? null: $scope.$eval($attrs.ngAreasOnLoad),
+							onAdd : (typeof $attrs.ngAreasOnAdd === 'undefined') ? null : $scope.$eval($attrs.ngAreasOnAdd),
+							onDelete : (typeof $attrs.ngAreasOnRemove === 'undefined') ? null : $scope.$eval($attrs.ngAreasOnRemove),
+							onChanged : (typeof $attrs.ngAreasOnChange === 'undefined') ? null: $scope.$eval($attrs.ngAreasOnChange),
+							allowEdit:   (typeof allow.edit === 'undefined') ? true :allow.edit,
+			                allowMove:   (typeof allow.move === 'undefined') ? true :allow.move,
+			                allowResize: (typeof allow.resize === 'undefined') ? true :allow.resize,
+			                allowSelect: (typeof allow.select === 'undefined') ? true :allow.select,
+			                allowDelete: (typeof allow.remove === 'undefined') ? true :allow.remove,
+			                allowNudge:  (typeof allow.nudge === 'undefined') ? true :allow.nudge   
+					};
+	    	}
+				var destroy = function(){
+					console.log('ngAreas:destroy');
+					mainImageSelectAreas.destroy();
+				}
+				
+				var reload = function(){
+					console.log('ngAreas:reload');
+					mainImageSelectAreas.init($element, getParameters());
+					console.log('global Areas: '+JSON.stringify(ngAreas._areas));
+				}
+				
+				var renameByAreaId = function(event, args) {
+					var areaid = args.areaid;
+					var name = args.name;
+					$(".name-area-id-"+areaid).html(name);
+				}
+				
+				$scope.$on("ngAreas:reload", reload);
+				
+				$scope.$on("ngAreas:destroy", destroy);
+				
+				$scope.$on("ngAreas:renameByAreaId", renameByAreaId);
+				
+				$element.css('display', 'none');
+	    	$element.bind('load', function() {
+					mainImageSelectAreas.init($element, getParameters());
+					$element.css('display', 'block');
+	      });
 
 			 $element.bind('error', function(){
 				 $.error( "Method " +  customOptions + " on load error" );
@@ -59,7 +82,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                width: 0,
 		                name: 'no name',
 		                cssClass: ""
-		            },(typeof $attrs.ngAreasExtendData ==='undefined') ? {} : $scope.ngAreasExtendData),
+		            },(typeof $attrs.ngAreasExtendData ==='undefined') ? {} : $scope.$eval($attrs.ngAreasExtendData)),
 		            blur = function () {
 		                area.z = 0;
 		                refresh("blur");
@@ -73,7 +96,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                return area;
 		            },
 		            fireEvent = function (event) {
-		                $image.trigger(event, [area.areaid, parent.areas(), area]);
+		                $image.trigger(event, [ parent.removeRatio(area), parent.areas()]);
 		            },
 		            cancelEvent = function (e) {
 		                var event = e || window.event || {};
@@ -134,7 +157,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                    top : area.y + 1,
 		                    "z-index": area.z + 2
 		                });
-		                $name = $($selection).empty().append($("<div><span class=\"select-area-field-label area-id-"+area.areaid+"\">"+area.name+"</span></div>"));
+		                $name = $($selection).empty().append($("<div><span class=\"select-area-field-label name-area-id-"+area.areaid+"\">"+area.name+"</span></div>"));
 		            },
 		            updateResizeHandlers = function (show) {
 		                if (! options.allowResize) {
@@ -347,43 +370,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                if (resizeVertically) {
 		                    area.height = height;
 		                }
-		                // If any aspect ratio is specified
-		                if (options.aspectRatio) {
-		                    // Calculate the new width and height
-		                    if ((width > 0 && height > 0) || (width < 0 && height < 0)) {
-		                        if (resizeHorizontally) {
-		                            height = Math.round(width / options.aspectRatio);
-		                        } else {
-		                            width = Math.round(height * options.aspectRatio);
-		                        }
-		                    } else {
-		                        if (resizeHorizontally) {
-		                            height = - Math.round(width / options.aspectRatio);
-		                        } else {
-		                            width = - Math.round(height * options.aspectRatio);
-		                        }
-		                    }
-		                    // Test if the new size exceeds the image bounds
-		                    if (selectionOrigin[0] + width > $image.width()) {
-		                        width = $image.width() - selectionOrigin[0];
-		                        height = (height > 0) ? Math.round(width / options.aspectRatio) : - Math.round(width / options.aspectRatio);
-		                    }
-
-		                    if (selectionOrigin[1] + height < 0) {
-		                        height = - selectionOrigin[1];
-		                        width = (width > 0) ? - Math.round(height * options.aspectRatio) : Math.round(height * options.aspectRatio);
-		                    }
-
-		                    if (selectionOrigin[1] + height > $image.height()) {
-		                        height = $image.height() - selectionOrigin[1];
-		                        width = (width > 0) ? Math.round(height * options.aspectRatio) : - Math.round(height * options.aspectRatio);
-		                    }
-
-		                    // Set the selection size
-		                    area.width = width;
-		                    area.height = height;
-		                }
-
+	
 		                if (area.width < 0) {
 		                    area.width = Math.abs(area.width);
 		                    area.x = selectionOrigin[0] - area.width;
@@ -396,7 +383,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                } else {
 		                    area.y = selectionOrigin[1];
 		                }
-
+		                
 		                fireEvent("changing");
 		                refresh("resizeSelection");
 		            },
@@ -456,9 +443,10 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                	area.newBox = false;
 		                	delete area.newBox;
 		                	fireEvent("onAdd");
-		                }
+		                }else{
+		                	fireEvent("changed");
+			              }
 		                
-		                fireEvent("changed");
 		                refresh("releaseSelection");
 		            },
 		            deleteSelection = function (event) {
@@ -505,7 +493,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 
 
 		        // Initialize an outline layer and place it above the trigger layer
-		        $outline = $("<div class=\"select-areas-outline\" />")
+		        $outline = $("<div class=\"ngAreas-element select-areas-outline\" />")
 		            .css({
 		                opacity : options.outlineOpacity,
 		                position : "absolute"
@@ -513,7 +501,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		            .insertAfter($trigger);
 
 		        // Initialize a selection layer and place it above the outline layer
-		        $selection = $("<div />")
+		        $selection = $("<div class=\"ngAreas-element\" />")
 		            .addClass("select-areas-background-area")
 		            .css({
 		                background : "#fff url(" + $image.attr("src") + ") no-repeat",
@@ -525,7 +513,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		        // Initialize all handlers
 		        if (options.allowResize) {
 		            $.each(["nw", "n", "ne", "e", "se", "s", "sw", "w"], function (key, card) {
-		                $resizeHandlers[card] =  $("<div class=\"select-areas-resize-handler " + card + "\"/>")
+		                $resizeHandlers[card] =  $("<div class=\"ngAreas-element select-areas-resize-handler " + card + "\"/>")
 		                    .css({
 		                        opacity : 0.5,
 		                        position : "absolute",
@@ -544,8 +532,8 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                    .bind("tap", deleteSelection);
 		                return $obj;
 		            };
-		            $btDelete = bindToDelete($("<div class=\"delete-area\" />"))
-		                .append(bindToDelete($("<div class=\"select-areas-delete-area\" />")))
+		            $btDelete = bindToDelete($("<div class=\"ngAreas-element delete-area\" />"))
+		                .append(bindToDelete($("<div class=\"ngAreas-element select-areas-delete-area\" />")))
 		                .insertAfter($selection);
 		        }
 
@@ -578,14 +566,14 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                    point.x = area.x + point.r;
 		                }
 		                moveTo(point);
-		                fireEvent("changed");
+		                fireEvent("changing");
 		            },
 		            set: function (dimensions, silent) {
 		                area = $.extend(area, dimensions);
 		                selectionOrigin[0] = area.x;
 		                selectionOrigin[1] = area.y;
 		                if (! silent) {
-		                    fireEvent("changed");
+		                    fireEvent("loaded");
 		                }
 		            },
 		            contains: function (point) {
@@ -595,9 +583,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		        };
 		    };
 
-
-		    var imageSelectAreas = function() { };
-
+		    
 		    imageSelectAreas.prototype.init = function (object, customOptions) {
 		        var that = this,
 		            defaultOptions = {
@@ -607,7 +593,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                allowSelect: true,
 		                allowDelete: true,
 		                allowNudge: true,
-		                aspectRatio: 0,
+		                ratio: 1,
 		                minSize: [0, 0],
 		                maxSize: [0, 0],
 		                width: 0,
@@ -615,6 +601,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                outlineOpacity: 0.5,
 		                overlayOpacity: 0.5,
 		                areas: [],
+		                onLoaded: null,
 		                onChanging: null,
 		                onChanged: null,
 		                onAdd: null,
@@ -627,14 +614,13 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		            this.options.allowSelect = this.options.allowMove = this.options.allowResize = this.options.allowDelete = false;
 		        }
 
-		        this._areas = {};
+		        this._areas = ngAreas._areas;
 
 		        // Initialize the image layer
 		        this.$image = $(object);
 
-		        this.ratio = 1;
 		        if (this.options.width && this.$image.width() && this.options.width !== this.$image.width()) {
-		        	this.ratio = this.options.width / this.$image[0].naturalWidth;
+		        	this.options.ratio = this.options.width / this.$image[0].naturalWidth;
 		            this.$image.width(this.options.width);
 		        }
 
@@ -656,7 +642,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		        }
 		        
 		        // Initialize an image holder
-		        this.$holder = $("<div />")
+		        this.$holder = $("<div class=\"ngAreas-element ngAreas-holder\"/>")
 		            .css({
 		                position : "relative",
 		                width: this.$image.width(),
@@ -670,7 +656,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		            });
 
 		        // Initialize an overlay layer and place it above the image
-		        this.$overlay = $("<div class=\"select-areas-overlay\" />")
+		        this.$overlay = $("<div class=\"ngAreas-element select-areas-overlay\" />")
 		            .css({
 		                opacity : this.options.overlayOpacity,
 		                position : "absolute",
@@ -680,7 +666,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		            .insertAfter(this.$image);
 
 		        // Initialize a trigger layer and place it above the overlay layer
-		        this.$trigger = $("<div />")
+		        this.$trigger = $("<div class=\"ngAreas-element\" />")
 		            .css({
 		                backgroundColor : "#000000",
 		                opacity : 0,
@@ -691,12 +677,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		            .insertAfter(this.$overlay);
 		        var that = this;
 		        $.each(this.options.areas, function (key, area) {
-		        	var tmp = $.extend({}, area);
-	            	  tmp.x = that.applyRatio(tmp.x);
-	            	  tmp.y = that.applyRatio(tmp.y);
-	            	  tmp.width = that.applyRatio(tmp.width);
-	            	  tmp.height = that.applyRatio(tmp.height);
-		            that._add(tmp, true);
+		            that._add(that.applyRatio(area), false);
 		        });
 
 
@@ -735,13 +716,36 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		        }
 		    };
 		    
-		    imageSelectAreas.prototype.applyRatio = function (val) {
-		    	return Math.round(val * this.ratio);
-	        };
+		    imageSelectAreas.prototype.applyRatio = function (area) {
+		    	  var that = this;
+  		    	var apply = function (val){
+  		    		return Math.round(val * that.options.ratio);
+  		    	}
 
-		    imageSelectAreas.prototype.removeRatio = function (val) {
-		    	return Math.round(val / this.ratio);
-	        };
+  		    	var tmp = $.extend({}, area);
+  		    	tmp.x = apply(tmp.x);
+  		    	tmp.y = apply(tmp.y);
+  		    	tmp.width = apply(tmp.width);
+  		    	tmp.height = apply(tmp.height);
+        	  
+  		    	return tmp;
+	      };
+
+		    imageSelectAreas.prototype.removeRatio = function (area) {
+		    		var that = this;
+  		    	var removeIt = function (val){
+  		    		return Math.round(val / that.options.ratio);
+  		    	}
+
+  		    	var tmp = $.extend({}, area);
+  		    	tmp.x = removeIt(tmp.x);
+  		    	tmp.y = removeIt(tmp.y);
+        	  tmp.width = removeIt(tmp.width);
+        	  tmp.height = removeIt(tmp.height);
+  		    	
+        	  return tmp;
+	      };
+			  
 
 		    imageSelectAreas.prototype._refresh = function () {
 		        var nbAreas = this.areas().length;
@@ -786,8 +790,8 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		        this._eachArea(function (area, index) {
 		        	areaid = Math.max(areaid, parseInt(index, 10));
 		        });
-		        areaid += 1;
-
+		        ngAreas.areaid += 1;
+		        areaid = ngAreas.areaid;
 		        this._areas[areaid] = $scope.imageArea(this, areaid);
 		        if (event) {
 		            this._areas[areaid].startSelection(event);
@@ -827,31 +831,27 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		    imageSelectAreas.prototype.reset = function () {
 		        var that = this;
 		        this._eachArea(function (area, areaid) {
-		            that.remove(areaid);
+		            delete that._areas[areaid];
 		        });
 		        this._refresh();
 		    };
 
 		    imageSelectAreas.prototype.destroy = function (element) {
-		    	if($(element).parent().hasClass('ng-areas-holder')){
-		        	this.reset();
-		        	$(element).parent().remove('div');
-		        }
-		        
-		        $(element).removeData("mainImageSelectAreas");
-		    };
+		      this.reset();
+			    $('.ngAreas-holder').find('img').unwrap();
+	        $('.ngAreas-element').remove();
+	        this.$overlay.remove();
+	        this.$trigger.remove();
+	        this.$image.removeData("mainImageSelectAreas");
+	      };
 
 		    imageSelectAreas.prototype.areas = function () {
 		        var ret = [];
 		        var that = this;
 		        var areas = this.relativeAreas();
-	            for (var i = 0; i < areas.length; i++) {
+	          for (var i = 0; i < areas.length; i++) {
 		            ret[i] = $.extend({}, areas[i]);
-		            ret[i].x = that.removeRatio(ret[i].x);
-		            ret[i].y = that.removeRatio(ret[i].y);
-		            ret[i].width = that.removeRatio(ret[i].width);
-		            ret[i].height = that.removeRatio(ret[i].height);
-		            delete ret[i].areaid;
+		            ret[i] = that.removeRatio(ret[i]);
 		        }
 
 		        return ret;
@@ -882,17 +882,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		        return res;
 		    };
 		
-		    $scope.selectAreas = function(object, options) {
-		    	var $object = $(object);
-		        if (! $object.data("mainImageSelectAreas")) {
-		            var mainImageSelectAreas = new imageSelectAreas();
-		            mainImageSelectAreas.init(object, options);
-		            $object.data("mainImageSelectAreas", mainImageSelectAreas);
-		            $object.trigger("loaded");
-		        }
-		        return $object.data("mainImageSelectAreas");
-		    };
-		    
+	    
 		    var execCommand = function (currentObject, command){
 		    	if ( imageSelectAreas.prototype[command] ) { // Method call
 		            var ret = imageSelectAreas.prototype[ command ].apply( $scope.selectAreas(currentObject), Array.prototype.slice.call( arguments, 1 ));
