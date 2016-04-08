@@ -42,6 +42,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 				var renameByAreaId = function(event, args) {
 					var areaid = args.areaid;
 					var name = args.name;
+					mainImageSelectAreas.renameArea(areaid, name);
 					$(".name-area-id-"+areaid).html(name);
 				}
 				
@@ -141,8 +142,8 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                    cursor: "default",
 		                    width: area.width,
 		                    height: area.height,
-		                    left: area.x,
-		                    top: area.y
+		                    left: area.x - 3,
+		                    top: area.y - 3
 		                });
 
 		                // Update the selection layer
@@ -153,11 +154,11 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                    cursor : options.allowMove ? "move" : "default",
 		                    width: (area.width - 2 > 0) ? (area.width - 2) : 0,
 		                    height: (area.height - 2 > 0) ? (area.height - 2) : 0,
-		                    left : area.x + 1,
-		                    top : area.y + 1,
+		                    left : area.x - 2,
+		                    top : area.y - 2,
 		                    "z-index": area.z + 2
 		                });
-		                $name = $($selection).empty().append($("<div><span class=\"select-area-field-label name-area-id-"+area.areaid+"\">"+area.name+"</span></div>"));
+		                $name = $($selection).empty().append($("<div><span class=\"select-area-field-label "+area.cssClass+" border-thin name-area-id-"+area.areaid+"\">"+area.name+"</span></div>"));
 		            },
 		            updateResizeHandlers = function (show) {
 		                if (! options.allowResize) {
@@ -173,7 +174,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                            horizontal = name[name.length - 1];
 
 		                        if (vertical === "n") {             // ====== North* ======
-		                            top = - semiheight;
+		                            top = - semiheight - 10;
 
 		                        } else if (vertical === "s") {      // ====== South* ======
 		                            top = area.height - semiheight - 1;
@@ -186,7 +187,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		                            left = area.width - semiwidth - 1;
 
 		                        } else if (horizontal === "w") {    // ====== *West ======
-		                            left = - semiwidth;
+		                            left = - semiwidth - ((semiwidth> 20)? 10: 5);
 
 		                        } else {                            // == North & South ==
 		                            left = Math.round(area.width / 2) - semiwidth - 1;
@@ -501,7 +502,7 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		            .insertAfter($trigger);
 
 		        // Initialize a selection layer and place it above the outline layer
-		        $selection = $("<div class=\"ngAreas-element\" />")
+		        $selection = $("<div class=\"ngAreas-element  border-medium\" />")
 		            .addClass("select-areas-background-area")
 		            .css({
 		                background : "#fff url(" + $image.attr("src") + ") no-repeat",
@@ -865,6 +866,13 @@ ngAreas.directive("ngAreas", ['$parse', function ($parse) {
 		        return ret;
 		    };
 		    
+		    imageSelectAreas.prototype.renameArea = function (areaid, name) {
+		        this._eachArea(function (area) {
+		            if(area.getData().areaid===areaid){
+		            	area.getData().name = name;
+		            }
+		        });
+		    };
 		    imageSelectAreas.prototype.blurAll = function () {
 		        this._eachArea(function (area) {
 		            area.blur();
