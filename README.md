@@ -112,13 +112,15 @@ So far one event is listening by the plugin:
 		name : "a new Label or Name for this box"
 	});
  ```
-  
- Inspired by https://github.com/360Learning/jquery-select-areas
- 
+   
  
  
 ## LICENSE
 ```sh 	
  	MIT
 ```
+
+
+ Inspired by https://github.com/360Learning/jquery-select-areas
+
   
