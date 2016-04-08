@@ -100,6 +100,18 @@ Three events are fired by the plugin:
  - **ng-areas-on-change** (*null*) : triggered when the event "changed" is fired. arguments : (event, id, areas, area)
  
  
+## Events listener / subscribers
+So far one event is listening by the plugin:
+ - on "ngAreas:renameByAreaId"
+ 
+ usage
+ 
+ ```sh
+ 	$scope.$broadcast("ngAreas:renameByAreaId", {
+		areaid : areaid,
+		name : "a new Label or Name for this box"
+	});
+ ```
   
  Inspired by https://github.com/360Learning/jquery-select-areas
  
