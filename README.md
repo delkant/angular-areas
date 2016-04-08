@@ -100,7 +100,7 @@ Three events are fired by the plugin:
  - **ng-areas-on-change** (*null*) : triggered when the event "changed" is fired. arguments : (event, id, areas, area)
  
  
-## Events listener / subscribers
+## Event listeners / subscribers
 So far one event is listening by the plugin:
  - on "ngAreas:renameByAreaId"
  
